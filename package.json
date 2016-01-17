@@ -1,0 +1,19 @@
+{
+  "name": "new",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "traceur index.js --async-functions --async-generators",
+    "build": "traceur index.js --async-functions --async-generators --out index.es5.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "traceur": "*",
+    "express": "*",
+    "connect-pgclient": "*",
+    "morgan": "*"
+  }
+}
