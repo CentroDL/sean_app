@@ -4,56 +4,51 @@ $traceurRuntime.registerModule("index.js", [], function() {
   var routes = require("express");
   var postgresql = require('connect-pgclient');
   var morgan = require('morgan');
-  var accessDatabase = postgresql({
-    config: {database: "sean_app_dev"},
-    transaction: true
-  });
-  routes().use(morgan('combined')).get("/", function(req, res) {
-    var sleep,
-        sql,
-        result;
+  var accessDatabase = postgresql({config: {database: "sean_app_dev"}});
+  routes().use(morgan('combined')).get("/", accessDatabase, function(req, res) {
+    var sql,
+        sleep;
     return $traceurRuntime.asyncWrap(function($ctx) {
       while (true)
         switch ($ctx.state) {
           case 0:
-            sleep = function(ms) {
-              return new Promise(function(resolve) {
-                return setTimeout(resolve, ms);
-              });
-            };
             sql = function(sql) {
-              return new Promise(function(resolve) {
-                return req.db.client.query(sql, resolve);
+              return new Promise(function(resolve, reject) {
+                req.db.client.query(sql, function(err, result) {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve(result.rows);
+                  }
+                });
               });
             };
-            console.log("1");
-            $ctx.state = 9;
+            sleep = function() {
+              var ms = arguments[0] !== (void 0) ? arguments[0] : 0;
+              return new Promise(function(r) {
+                return setTimeout(r, ms);
+              });
+            };
+            console.log("start");
+            $ctx.state = 7;
             break;
-          case 9:
+          case 7:
             Promise.resolve(sleep(1000)).then($ctx.createCallback(2), $ctx.errback);
             return;
           case 2:
             console.log("2");
-            $ctx.state = 11;
+            $ctx.state = 9;
             break;
-          case 11:
-            Promise.resolve(sleep(1000)).then($ctx.createCallback(4), $ctx.errback);
+          case 9:
+            Promise.resolve(sql("SELECT * FROM users")).then($ctx.createCallback(5), $ctx.errback);
             return;
-          case 4:
-            console.log("3");
-            $ctx.state = 13;
-            break;
-          case 13:
-            Promise.resolve(sql("SELECT * FROM users")).then($ctx.createCallback(7), $ctx.errback);
-            return;
-          case 7:
+          case 5:
             result = $ctx.value;
-            $ctx.state = 6;
+            $ctx.state = 4;
             break;
-          case 6:
-            console.log("4");
+          case 4:
+            res.send(data.rows);
             console.log("done");
-            res.send("Hey!");
             $ctx.state = -2;
             break;
           default:
