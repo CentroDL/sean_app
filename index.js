@@ -1,3 +1,5 @@
+"use strict";
+
 let routes = require("express");
 let postgresql = require('connect-pgclient');
 let morgan = require('morgan');
