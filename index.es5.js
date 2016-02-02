@@ -20,7 +20,7 @@ $traceurRuntime.registerModule("index.js", [], function() {
       });
     };
     console.log("start");
-    db.task($traceurRuntime.initGeneratorFunction(function $__1(t) {
+    db.tx($traceurRuntime.initGeneratorFunction(function $__1(t) {
       var $__2,
           $__3;
       return $traceurRuntime.createGeneratorInstance(function($ctx) {

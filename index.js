@@ -22,7 +22,7 @@ routes()
     console.log("start");
     // await sleep(1000);
     // console.log("wake up");
-    db.task(function * (t) {
+    db.tx(function * (t) {
         yield t.none("INSERT INTO users (name) VALUES ('A')");
         yield sleep(1000);
         yield t.many("SELECT * FROM users");
