@@ -2,13 +2,17 @@ $traceurRuntime.registerModule("index.js", [], function() {
   "use strict";
   var __moduleName = "index.js";
   var routes = require("express");
-  var postgresql = require('connect-pgclient');
   var morgan = require('morgan');
-  var accessDatabase = postgresql({
-    config: {database: "sean_app_dev"},
-    transaction: true
-  });
-  routes().use(morgan('combined')).get("/", accessDatabase, function(req, res) {
+  var pgp = require('pg-promise')();
+  var cn = {
+    host: 'localhost',
+    port: 5432,
+    database: 'sean_app_dev',
+    user: 'jaden',
+    password: null
+  };
+  var db = pgp(cn);
+  routes().use(morgan('combined')).get("/", function(req, res) {
     var sleep,
         sql;
     return $traceurRuntime.asyncWrap(function($ctx) {
@@ -22,15 +26,7 @@ $traceurRuntime.registerModule("index.js", [], function() {
               });
             };
             sql = function(sql) {
-              return new Promise(function(resolve, reject) {
-                req.db.client.query(sql, function(err, result) {
-                  if (err) {
-                    reject(err);
-                  } else {
-                    resolve(result);
-                  }
-                });
-              });
+              return db.query(sql);
             };
             console.log("start");
             $ctx.state = 7;
@@ -51,7 +47,7 @@ $traceurRuntime.registerModule("index.js", [], function() {
             break;
           case 4:
             console.log("await works");
-            res.send(result.rows);
+            res.send(result);
             console.log("done");
             $ctx.state = -2;
             break;
