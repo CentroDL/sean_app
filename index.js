@@ -14,26 +14,29 @@ var db = pgp(cn);
 
 routes()
   .use(morgan('combined'))
-  .get("/", async (req, res) => {
+  .get("/", (req, res) => {
     let sleep = (ms = 0) => {
       return new Promise(r => setTimeout(r, ms));
     };
-    let sql = (sql) => {
-      return db.query(sql);
-    };
 
     console.log("start");
-    await sleep(1000);
-    console.log("wake up");
-    // sql("SELECT * FROM users").then(result => {
-    //   console.log(".then works: ", result);
-    //   res.send(result);
-    // })
+    // await sleep(1000);
+    // console.log("wake up");
+    db.task(function * (t) {
+        yield t.none("INSERT INTO users (name) VALUES ('A')");
+        yield sleep(1000);
+        yield t.many("SELECT * FROM users");
+        return yield sleep(1000);
+    })
+    .then(result => {
+      console.log(".then works: ", result);
+      res.send(result);
+    })
     // TODO: FOR SOME REASON THIS AWAIT DOESN'T WORK, EVEN THOUGH THE PROMISE
     //       ABOVE WORKS!
-    result = await sql("SELECT * FROM users");
-    console.log("await works");
-    res.send(result);
+    // result = await sql("SELECT * FROM users");
+    // console.log("await works");
+    // res.send(result);
     console.log("done");
   })
   .listen(3000);
